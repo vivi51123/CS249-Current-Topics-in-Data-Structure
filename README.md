@@ -1,5 +1,3 @@
-# CS249-Current-Topics-in-Data-Structure
-
 # UCLA Fall 2017 CS249 Current Topics in Data Structures
 Google drive - 
 
