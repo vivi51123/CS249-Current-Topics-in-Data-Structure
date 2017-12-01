@@ -33,23 +33,23 @@ def valid_start(x_start,y_start):
 
 
 
-def get_nearest_stop(element_list,stop_dict):
+def get_nearest_stop(element_list,coor_list,stop_dict):
 	nearest_stop = -1
 	if element_list[1] == "B" and element_list[3] != "":
 		nearest_stop = int(element_list[3])
 	else:
 		#calculate the nearest bus stop from the starting point
-		coor_list = np.array(ast.literal_eval(element_list[8]))
-		x_start = float(coor_list[0,0])
-		y_start = float(coor_list[0,1])
-		if valid_start(x_start,y_start):
-			min_dis = sys.float_info.max
-			for stop_id in stop_dict.keys():
-				x_stop, y_stop = float(stop_dict[stop_id][1]), float(stop_dict[stop_id][0])
-				tmp_dis = math.sqrt((x_start - x_stop)**2 + (y_start - y_stop)**2)
-				if tmp_dis < min_dis:
-					min_dis = tmp_dis
-					nearest_stop = stop_id 
+		if len(coor_list) > 0:
+			x_start = float(coor_list[0,0])
+			y_start = float(coor_list[0,1])
+			if valid_start(x_start,y_start):
+				min_dis = sys.float_info.max
+				for stop_id in stop_dict.keys():
+					x_stop, y_stop = float(stop_dict[stop_id][1]), float(stop_dict[stop_id][0])
+					tmp_dis = math.sqrt((x_start - x_stop)**2 + (y_start - y_stop)**2)
+					if tmp_dis < min_dis:
+						min_dis = tmp_dis
+						nearest_stop = stop_id 
 	return nearest_stop
 
 
@@ -93,21 +93,23 @@ def remove_dup(old_coor_list):
 
 
 
+def preprocessed_line(element_list,coor_list,stop_dict):
+	# 5 decimal point ~ 1m
+	# if we do not move at least 1m within 30s, then this is a new journey
+	new_coor_list = get_last_journey(np.around(coor_list,5),2)
+	# get the nearest taxi stand for last starting point
+	nearest_stop = get_nearest_stop(element_list,new_coor_list,stop_dict)
 
-def calculate_new_coor_list(coor_list,interval):
-	#getting the last trip
-	new_coor_list = get_last_journey(coor_list,interval)
-	#keep three decimal and throw away the duplicates
 	new_coor_list = remove_dup(new_coor_list)
-	return new_coor_list
+	return nearest_stop,new_coor_list
 
 
 
-def preprocessed_data(meta_folder,preprocessed_folder):
-	content = open(meta_folder + "/train.csv",'r')
-	result = open(preprocessed_folder + "/train.csv",'w+')
+
+def preprocess_train_data(meta_folder,preprocessed_folder):
+	content = open(meta_folder+"/train.csv",'r')
+	result = open(preprocessed_folder+"/train.csv",'w+')
 	stop_dict = get_stop_dict(meta_folder+"/metaData_taxistandsID_name_GPSlocation.csv")
-
 
 	#skip the header line
 	header = content.readline()
@@ -116,29 +118,47 @@ def preprocessed_data(meta_folder,preprocessed_folder):
 	count = 0
 
 	for line in content.readlines():
-
 		count += 1
 		element_list = line.split('"')[1::2]
 		trip_id,timestamp,day_type,coor_list = element_list[0],element_list[5],element_list[6],np.array(ast.literal_eval(element_list[8]))
 		#if there is missing data, we ignore this training sample
 		if element_list[7] == "True" or len(coor_list) == 0:
 			continue
-		#if the start point excceed the defined limit, we ignore this training sample
-		nearest_stop = get_nearest_stop(element_list,stop_dict)
-		if nearest_stop == -1:
-			continue	
-		new_coor_list = calculate_new_coor_list(coor_list,4)
+
+		nearest_stop,new_coor_list = preprocessed_line(element_list,coor_list,stop_dict)
 		result.write("\""+str(trip_id)+"\",\""+str(timestamp)+"\",\""+str(day_type)+"\",\""+str(nearest_stop)
 			+"\",\""+str(new_coor_list.tolist())+"\"\n")
 
 		if count%10000 == 0:
 			print(count)
-
 	content.close()
 	result.close()
 
 
-		
+
+def preprocess_test_data(meta_folder,preprocessed_folder):
+	content = open(meta_folder+"/test.csv",'r')
+	result = open(preprocessed_folder+"/test.csv",'w+')
+	stop_dict = get_stop_dict(meta_folder+"/metaData_taxistandsID_name_GPSlocation.csv")
+
+	#skip the header line
+	header = content.readline()
+	result.write("\"TRIP_ID\",\"TIMESTAMP\",\"DAY_TYPE\",\"NEAREST_STOP\",\"POLYLINE\"\n")
+
+	for line in content.readlines():
+		element_list = line.split('"')[1::2]
+		trip_id,timestamp,day_type,coor_list = element_list[0],element_list[5],element_list[6],np.array(ast.literal_eval(element_list[8]))
+
+		nearest_stop,new_coor_list = preprocessed_line(element_list,coor_list,stop_dict)
+		result.write("\""+str(trip_id)+"\",\""+str(timestamp)+"\",\""+str(day_type)+"\",\""+str(nearest_stop)
+			+"\",\""+str(new_coor_list.tolist())+"\"\n")
+	content.close()
+	result.close()
+
+
+
+
+
 
 
 
@@ -146,13 +166,9 @@ def preprocessed_data(meta_folder,preprocessed_folder):
 
 
 def main():
-	preprocessed_data("../data/meta","../data/preprocessed")
+	preprocess_test_data("../data/meta","../data/preprocessed")
+	preprocess_train_data("../data/meta","../data/preprocessed")
 
-	'''
-	temp = [[1,1],[2,2],[3,3],[3,3]]
-	new_coor_list = remove_dup(temp)
-	print(new_coor_list.tolist())
-	'''
 
 
 
