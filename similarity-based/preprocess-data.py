@@ -60,11 +60,8 @@ def get_last_journey(coor_list,interval):
 	last_y = -1
 	still = 0
 	start = 0
-	index = 0
-	for coor in coor_list:
-		print(coor[0])
-		print(coor[1])
-
+	for index in range(len(coor_list)-interval):
+		coor = coor_list[index]
 		if last_x == coor[0] and last_y == coor[1]:
 			still+=1
 		else:
@@ -72,20 +69,9 @@ def get_last_journey(coor_list,interval):
 			last_y = coor[1]
 			still = 0
 
-		if still >= 4:
-			start = index
+		if still >= interval:
+			start = index + 1
 	new_coor_list = coor_list[start:,]
-
-
-
-
-def calculate_new_coor_list(coor_list,interval):
-	#getting the last trip
-	new_coor_list = get_last_journey(coor_list,interval)
-
-	#keep three decimal and throw away the duplicates
-
-
 	return new_coor_list
 
 
@@ -93,12 +79,27 @@ def calculate_new_coor_list(coor_list,interval):
 
 
 
+#keep three decimals and remove the duplicates#
+def remove_dup(old_coor_list):
+	old_coor_list = np.around(old_coor_list,3)
+	new_coor_list = np.array([[0,0]])
+	last_coor = [0,0]
+	for coor in old_coor_list:
+		if coor[0] != last_coor[0] or coor[1] != last_coor[1]:
+			new_coor_list = np.append(new_coor_list,coor)
+		last_coor = coor
+	return new_coor_list.reshape(-1,2)[1:,]
 
 
 
 
 
-
+def calculate_new_coor_list(coor_list,interval):
+	#getting the last trip
+	new_coor_list = get_last_journey(coor_list,interval)
+	#keep three decimal and throw away the duplicates
+	new_coor_list = remove_dup(new_coor_list)
+	return new_coor_list
 
 
 
@@ -110,12 +111,13 @@ def preprocessed_data(meta_folder,preprocessed_folder):
 
 	#skip the header line
 	header = content.readline()
-	result.write("\"TRIP_ID\",\"TIMESTAMP\",\"DAY_TYPE\",\"NEAREST_STOP\",\"POLYLINE\"")
-	print(header)
+	result.write("\"TRIP_ID\",\"TIMESTAMP\",\"DAY_TYPE\",\"NEAREST_STOP\",\"POLYLINE\"\n")
 
 	count = 0
 
 	for line in content.readlines():
+
+		count += 1
 		element_list = line.split('"')[1::2]
 		trip_id,timestamp,day_type,coor_list = element_list[0],element_list[5],element_list[6],np.array(ast.literal_eval(element_list[8]))
 		#if there is missing data, we ignore this training sample
@@ -124,26 +126,19 @@ def preprocessed_data(meta_folder,preprocessed_folder):
 		#if the start point excceed the defined limit, we ignore this training sample
 		nearest_stop = get_nearest_stop(element_list,stop_dict)
 		if nearest_stop == -1:
-			continue
-
-
-
-		
+			continue	
 		new_coor_list = calculate_new_coor_list(coor_list,4)
+		result.write("\""+str(trip_id)+"\",\""+str(timestamp)+"\",\""+str(day_type)+"\",\""+str(nearest_stop)
+			+"\",\""+str(new_coor_list.tolist())+"\"\n")
+
+		if count%10000 == 0:
+			print(count)
+
+	content.close()
+	result.close()
+
+
 		
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -152,6 +147,12 @@ def preprocessed_data(meta_folder,preprocessed_folder):
 
 def main():
 	preprocessed_data("../data/meta","../data/preprocessed")
+
+	'''
+	temp = [[1,1],[2,2],[3,3],[3,3]]
+	new_coor_list = remove_dup(temp)
+	print(new_coor_list.tolist())
+	'''
 
 
 
