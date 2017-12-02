@@ -40,22 +40,6 @@ def nearest_stand_visual ():
 	#print len(m.nearest_stand.unique())
 	m = m.groupby('nearest_stand')['destination'].apply(', '.join).reset_index()
 
-	# for index in m.index: 
-	# 	array = []
-	# 	prev = ""
-	# 	count = 0
-	# 	curMax = 0
-		# for dest in m.iloc[index]['destination']: 
-	# 		if (dest == prev):
-	# 			count = count + 1
-	# 		else:
-	# 			curMax = max(count, curMax)
-	# 			count = 0
-	# 		prev = dest
-	# 	array.append(curMax) 
-	# 	#print curMax
-	# 	curMax = 0
-
 	# print array
 	print "0"
 	print " "
