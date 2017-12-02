@@ -107,8 +107,8 @@ def preprocessed_line(element_list,coor_list,stop_dict):
 
 
 def preprocess_train_data(meta_folder,preprocessed_folder):
-	content = open(meta_folder+"/train.csv",'r')
-	result = open(preprocessed_folder+"/train.csv",'w+')
+	content = open(preprocessed_folder+"/split-train.csv",'r')
+	result = open(preprocessed_folder+"/preprocessed-train.csv",'w+')
 	stop_dict = get_stop_dict(meta_folder+"/metaData_taxistandsID_name_GPSlocation.csv")
 
 	#skip the header line
@@ -131,6 +131,28 @@ def preprocess_train_data(meta_folder,preprocessed_folder):
 
 		if count%10000 == 0:
 			print(count)
+	content.close()
+	result.close()
+
+
+
+
+def preprocess_validation_data(meta_folder,preprocessed_folder):
+	content = open(preprocessed_folder+"/split-validation.csv",'r')
+	result = open(preprocessed_folder+"/preprocessed-validation.csv",'w+')
+	stop_dict = get_stop_dict(meta_folder+"/metaData_taxistandsID_name_GPSlocation.csv")
+
+	#skip the header line
+	header = content.readline()
+	result.write("\"TRIP_ID\",\"TIMESTAMP\",\"DAY_TYPE\",\"NEAREST_STOP\",\"POLYLINE\"\n")
+
+	for line in content.readlines():
+		element_list = line.split('"')[1::2]
+		trip_id,timestamp,day_type,coor_list = element_list[0],element_list[5],element_list[6],np.array(ast.literal_eval(element_list[8]))
+
+		nearest_stop,new_coor_list = preprocessed_line(element_list,coor_list,stop_dict)
+		result.write("\""+str(trip_id)+"\",\""+str(timestamp)+"\",\""+str(day_type)+"\",\""+str(nearest_stop)
+			+"\",\""+str(new_coor_list.tolist())+"\"\n")
 	content.close()
 	result.close()
 
@@ -160,13 +182,9 @@ def preprocess_test_data(meta_folder,preprocessed_folder):
 
 
 
-
-
-
-
-
 def main():
 	preprocess_test_data("../data/meta","../data/preprocessed")
+	preprocess_validation_data("../data/meta","../data/preprocessed")
 	preprocess_train_data("../data/meta","../data/preprocessed")
 
 
