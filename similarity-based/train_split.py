@@ -91,7 +91,7 @@ def main():
 
 	random.seed(13)
 	timestamp_list = random.sample(range(1372809600,1388361600),200)
-	split_train("../data/meta/train.csv","../data/preprocessed/real-train.csv","../data/preprocessed/real-validation.csv","../data/preprocessed/validation-answer.csv",timestamp_list)
+	split_train("../data/meta/train.csv","../data/preprocessed/split-train.csv","../data/preprocessed/split-validation.csv","../data/preprocessed/validation-answer.csv",timestamp_list)
 
 
 	
