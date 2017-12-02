@@ -136,6 +136,7 @@ def preprocess_train_data(meta_folder,preprocessed_folder):
 
 
 
+
 def preprocess_test_data(meta_folder,preprocessed_folder):
 	content = open(meta_folder+"/test.csv",'r')
 	result = open(preprocessed_folder+"/test.csv",'w+')
@@ -154,11 +155,6 @@ def preprocess_test_data(meta_folder,preprocessed_folder):
 			+"\",\""+str(new_coor_list.tolist())+"\"\n")
 	content.close()
 	result.close()
-
-
-
-
-
 
 
 
