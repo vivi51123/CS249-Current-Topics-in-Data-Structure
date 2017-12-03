@@ -12,6 +12,9 @@ def get_destination(train_coor_list):
 
 
 def judge_stand_similarity(test_stand,train_stand):
+	print("inside judge stand function")
+	print("test stand"+str(test_stand))
+	print("train stand"+str(train_stand))
 	return test_stand == train_stand
 
 
@@ -50,6 +53,8 @@ def calculate_journey_similarity(test_coor_list,train_coor_list):
 # the correlation 1:1:10
 def predict_single_case(line,train_file):
 
+	print(line)
+
 	element_list = line.split('"')[1::2]
 	trip_id,start_time,day_type,nearest_stop = element_list[0],int(element_list[1]),element_list[2],int(element_list[3])
 	coor_list = np.array(ast.literal_eval(element_list[4]))
@@ -60,25 +65,38 @@ def predict_single_case(line,train_file):
 
 
 	train_content = open(train_file,'r')
-	train_content.readline()
+	header = train_content.readline()
 	for train_line in train_content.readlines():
 
-		train_element_list = line.split('"')[1:2]
+		train_element_list = train_line.split('"')[1:2]
 		train_start_time,train_nearest_stop = int(train_element_list[1]),int(train_element_list[3])
 		train_coor_list = np.array(ast.literal_eval(train_element_list[4]))
 		train_destination_x,train_destination_y = get_destination(train_coor_list)
 
+		print("info for train:")
+		print(train_start_time)
+		print(train_nearest_stop)
+		print(train_destination_x)
+		print(train_destination_y)
+
 		#if this is a trip with the same nearset taxi stand
 		if judge_stand_similarity(nearest_stop,train_nearest_stop):
 			similar_trip_nearest.append([train_destination_x,train_destination_y])
+		else:
+			print("not similar stand")
 
 		#if this is a trip with some near start time
 		if judge_start_similarity(start_time,train_start_time):
 			similar_trip_start.append([train_destination_x,train_destination_y])
 
+		else:
+			print("not similar start time")
+
 		journey_similarity = calculate_journey_similarity(coor_list,train_coor_list)
 		#only keep top 200 similar journeys
 		similar_trip_journey[journey_similarity].append([train_destination_x,train_destination_y])
+
+		exit(0)
 
 
 	total_x_start = 0
@@ -138,32 +156,38 @@ def predict_single_case(line,train_file):
 
 
 		
-def predict_validation(test_file,test_answer,train_file):
-	total_dis = 0
+def predict_validation(test_file,test_answer,train_file,predict_result_file,new_answer_file):
 	test_content = open(test_file,'r')
 	test_answer = open(train_file,'r')
+	test_predict = open(predict_result_file,'w+')
+	new_test_answer = open(new_test_answer,'w+')
+	test_predict.write("\"TRIP_ID\",\"LATITUDE\",\"LONGITUDE\"\n")
+	new_test_answer.write("\"TRIP_ID\",\"LATITUDE\",\"LONGITUDE\"\n")
+
 	test_content.readline()
 	for line in test_content.readlines():
+		element_list = line.split('"')[1::2]
+		trip_id = element_list[0]
 		result_x,result_y = predict_single_case(line,train_file)
+
 		answer_line = test_answer.readline()
 		answer_x,answer_y = answer_line.split(',')[0],answer_line.split(',')[1]
-		dis = ((answer_x -result_x)**2 + (answer_y - result_y)**2)**0.5
-		total_dis += dis
-	return total_dis
 
+		test_predict.write("\"T"+str(trip_id)+"\","+str(result_y)+","+str(result_x))
+		new_test_answer.write("\"T"+str(trip_id)+"\","+str(answer_y)+","+str(answer_x))
 
+		exit(0)
 
-def predict_test()
-
-
-
-
-
-
+	test_content.close()
+	test_answer.close()
+	new_test_answer.close()
+	test_predict.close()
 
 
 
 def main():
+	predict_validation("../preprocessed/preprocessed-validation.csv","../preprocessed/validation-answer.csv","../preprocessed/preprocessed-train.csv","../result/predict-validationq.csv","../preprocessed/new-validation-answer.csv")
+
 
 
 
