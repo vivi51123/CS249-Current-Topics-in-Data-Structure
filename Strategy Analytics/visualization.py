@@ -16,83 +16,37 @@ def nearest_stand_visual ():
 	m = pd.read_csv('vivi.csv', header=0, usecols=['trip_id','nearest_stand','destination'])
 	#print len(m.nearest_stand.unique())
 	
+	#For convert lat lon string to float tuple
 	m['destination'] = [literal_eval(x) for x in m['destination']]
+	
+	m['lat'] = ""
+	m['lon'] = ""
 
-	#type(m.iloc[0]['destination'][0]) = float
-	#type(m.iloc[0]['destination']) = list of float 
+	for index, cord in enumerate(m['destination']): 
+		m.set_value(index, 'lat', round(cord[0], 3))
+		m.set_value(index, 'lon', round(cord[1], 3))
 
-	#print m[0:4]['destination']
+	m = m.drop('destination', axis=1)
+	
+	m['coordinate'] = m['lat'].map(str)+m['lon'].map(str)
+	m['coordinate'] = m['coordinate'].str.replace('.', '')
 
-	# print m.iloc[0]['destination'][0] 
-	# print m.iloc[0]['destination'][1]
-
-	for index in m[0:16999].index: 
-		i = 0
-		for cord in m.iloc[index]['destination']: 
-			m.iloc[index]['destination'][i] = round(cord, 3)
-			i = i + 1
-
-			
-	# print "------"
-	# print m[15000:17000]['destination']
-
-	#print Counter(m.iloc[0]['destination']) gives one for each float
 	m['destination'] = m['destination'].apply(lambda x: ', '.join([str(i) for i in x]))
-	#print type(m.iloc[0]['destination'])
 	
-	m = m.groupby('nearest_stand')['destination'].apply(', '.join).reset_index()
-	# m = m.groupby('nearest_stand')['destination']
-	# m = m.groupby('nearest_stand')
+	#m = m.groupby('nearest_stand')['lat'].apply(lambda x: ','.join(x.astype(str))).reset_index()
+	#m = m.groupby('nearest_stand').apply(lambda x: pd.Series({'lat': ','.join(x['lat'].astype(str)), 'lon': ','.join(x['lon'].astype(str))})).reset_index()
+	m = m.groupby('nearest_stand')['coordinate'].apply(lambda x: ','.join(x.astype(str))).reset_index()
 
-	print m[0:1]['destination']
-
-	m['destination'] = [literal_eval(x) for x in m['destination']]
-
-	#print m[0:4]['destination']
+	#print m[0:1]['destination']
+	#m['destination'] = [literal_eval(x) for x in m['destination']]
 	
-	print Counter(m.iloc[0]['destination'])
+	# Convert to tuple again
+	m['coordinate'] = [literal_eval(x) for x in m['coordinate']]
 	
-	#for index in m[0:4].index:
-		#print Counter(m.iloc[index]['destination'])
-	#print m.iloc[0]['destination']
+	#print Counter(m.iloc[0]['destination'])
+	for index in range(0,63): 
+		print Counter(m.iloc[index]['coordinate']).most_common(10)
 
-	# for index in m.index: 
-	# 	array = []
-	# 	prev = ""
-	# 	count = 0
-	# 	curMax = 0
-		# for dest in m.iloc[index]['destination']: 
-	# 		if (dest == prev):
-	# 			count = count + 1
-	# 		else:
-	# 			curMax = max(count, curMax)
-	# 			count = 0
-	# 		prev = dest
-	# 	array.append(curMax) 
-	# 	#print curMax
-	# 	curMax = 0
-
-	# print array
-	# print "0"
-	# print " "
-	# print " "	
-	# print m.iloc[0]['destination']
-	# print "1"
-	# print " "
-	# print " "
-	# print " "
-	# print " "	
-	# print m.iloc[1]['destination']
-	# print "2"
-	# print " "
-	# print " "
-	# print " "	
-	# print m.iloc[2]['destination']
-	# print "3"
-	# print " "
-	# print " "
-	# print " "	
-	# print m.iloc[3]['destination']
 #############################################################################################
 
 def main(): 
