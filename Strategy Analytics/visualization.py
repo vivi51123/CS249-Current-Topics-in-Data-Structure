@@ -31,7 +31,7 @@ def nearest_stand_visual ():
 	m['coordinate'] = m['lat'].map(str)+m['lon'].map(str)
 	m['coordinate'] = m['coordinate'].str.replace('.', '')
 
-	m['destination'] = m['destination'].apply(lambda x: ', '.join([str(i) for i in x]))
+	#m['destination'] = m['destination'].apply(lambda x: ', '.join([str(i) for i in x]))
 	
 	#m = m.groupby('nearest_stand')['lat'].apply(lambda x: ','.join(x.astype(str))).reset_index()
 	#m = m.groupby('nearest_stand').apply(lambda x: pd.Series({'lat': ','.join(x['lat'].astype(str)), 'lon': ','.join(x['lon'].astype(str))})).reset_index()
@@ -44,9 +44,23 @@ def nearest_stand_visual ():
 	m['coordinate'] = [literal_eval(x) for x in m['coordinate']]
 	
 	#print Counter(m.iloc[0]['destination'])
-	for index in range(0,63): 
-		print Counter(m.iloc[index]['coordinate']).most_common(10)
+	#for index in range(0,63): 
+		#print Counter(m.iloc[index]['coordinate']).most_common(10)
 
+	countList = []
+
+	for index in range(0,63): 
+		#c = Counter(m.iloc[index]['coordinate']).most_common(10)
+		c = Counter(m.iloc[index]['coordinate']).most_common(20)
+		for pair in c: 
+			countList.append(pair[1])
+	
+	plt.title('Taxi Stand vs # Destination Count')
+	plt.plot(list(range(len(countList))), countList, color='r')
+	# plt.xticks(np.arange(20))
+	plt.xlabel('Taxi Stand')
+	plt.ylabel('Destination Count')
+	plt.show()
 #############################################################################################
 
 def main(): 
