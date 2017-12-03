@@ -16,7 +16,7 @@ def judge_stand_similarity(test_stand,train_stand):
 
 
 def judge_start_similarity(test_start,train_start):
-	within_hour = (abs(test_start - train_start)) <= 3600
+	within_hour = (abs(test_start - train_start)%(24*3600)) <= 3600
 	return within_hour
 
 
@@ -83,56 +83,82 @@ def predict_single_case(line,train_file):
 
 	total_x_start = 0
 	total_y_start = 0
+	start_match_count = 0
+
 
 	for [x,y] in similar_trip_start:
 		total_x_start += x
 		total_y_start += y
+		start_match_count += 1
+	avg_x_start = total_x_start/start_match_count
+	avg_y_start = total_y_start/start_match_count
+
 
 	total_x_stand = 0
 	total_y_stand = 0
+	stand_match_count = 0
 
 	for[x,y] in similar_trip_nearest:
 		total_x_stand += x
 		total_y_stand += y
+		stand_match_count += 1
+	avg_x_stand = total_x_stand/stand_match_count
+	avg_y_stand = total_y_stand/stand_match_count
+
 
 	total_x_journey = 0
 	total_y_journey = 0
 
+	#only select the top 100 journeys
 	key_list = sorted(similar_trip_journey)
+	journey_match_count = 0
+	end = False
 	for key in key_list:
-		
+		match_coor_list = similar_trip_journey[key]
+		for [x,y] in match_coor_list:
+			journey_match_count += 1
+			if journey_match_count <= 100:
+				total_x_journey += x
+				total_y_journey += y
+			else:
+				break
+		if end:
+			break
 
+	avg_x_journey = total_x_journey/journey_match_count
+	avg_y_journey = total_y_journey/journey_match_count
 
-
-
-
-
-
-
-
-
-
-
+	#assigning different weight to the different similarity
+	#right now: 1:1:10
+	final_x = (total_x_start + total_x_stand + total_x_journey * 10)/12
+	final_y = (total_y_start + total_y_stand + total_y_journey * 10)/12
 
 	train_content.close()
+	return final_x, final_y
 
 
 		
-
-
-
-
-
-
-def predict_test(test_file,train_file):
+def predict_validation(test_file,test_answer,train_file):
+	total_dis = 0
 	test_content = open(test_file,'r')
+	test_answer = open(train_file,'r')
 	test_content.readline()
 	for line in test_content.readlines():
-		result = predict_single_case(line,train_file)
+		result_x,result_y = predict_single_case(line,train_file)
+		answer_line = test_answer.readline()
+		answer_x,answer_y = answer_line.split(',')[0],answer_line.split(',')[1]
+		dis = ((answer_x -result_x)**2 + (answer_y - result_y)**2)**0.5
+		total_dis += dis
+	return total_dis
 
 
 
-		
+def predict_test()
+
+
+
+
+
 
 
 
