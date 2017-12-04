@@ -105,7 +105,7 @@ def predict_single_case(line,train_file,hour,neighour):
 
 			#if this is a trip with the same nearset taxi stand and start from the similar time
 			#if judge_stand_similarity(nearest_stop,train_nearest_stop) and judge_start_similarity(start_time,train_start_time,hour):
-			journey_similarity = calculate_journey_similarity(coor_list,train_coor_list,weight)
+			journey_similarity = calculate_journey_similarity(coor_list,train_coor_list)
 			#only keep top 200 similar journeys
 			similar_trip_journey[journey_similarity].append([train_destination_x,train_destination_y])
 			count += 1
