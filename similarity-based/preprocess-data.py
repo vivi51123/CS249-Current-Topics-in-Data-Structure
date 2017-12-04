@@ -183,7 +183,7 @@ def preprocess_test_data(meta_folder,preprocessed_folder):
 
 
 def main():
-	preprocess_test_data("../data/meta","../data/preprocessed")
+	#preprocess_test_data("../data/meta","../data/preprocessed")
 	preprocess_validation_data("../data/meta","../data/preprocessed")
 	preprocess_train_data("../data/meta","../data/preprocessed")
 
