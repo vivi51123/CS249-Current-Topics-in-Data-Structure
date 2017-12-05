@@ -1,8 +1,6 @@
 import sklearn
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import pandas as pd
-#import numpy as np
-#import csv
 from collections import Counter 
 from ast import literal_eval
 
