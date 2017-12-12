@@ -1,7 +1,7 @@
 # UCLA Fall 2017 CS249: Big Data Analytics (Wei Wang)
 
 ## Introduction
-
+The goal of this project is to predict the taxi trip destination in Porto, Portugal based on some given initial partial trajectories. Kaggle contest details can be found [here](https://www.kaggle.com/c/pkdd-15-predict-taxi-service-trajectory-i).
 
 ## Members
 - Junheng Hao (jhao@cs.ucla.edu)
