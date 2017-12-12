@@ -51,4 +51,4 @@ Note that some script expect the repository to be in your PYTHONPATH (go to the 
    When running the training script, set the following Theano flags environment variable to exploit GPU parallelism:
    `THEANO_FLAGS=floatX=float32,device=gpu,optimizer=fast_run`
 
-*More information in [this pdf](https://github.com/adbrebs/taxi/blob/master/doc/short_report.pdf)* and our [project report]().
+*More information in [this pdf](https://github.com/adbrebs/taxi/blob/master/doc/short_report.pdf)* and our [project report](https://github.com/vivi51123/CS249-Current-Topics-in-Data-Structure/blob/master/adbrebs-taxi/doc/cs249-project-report-VWXYJ.pdf).
