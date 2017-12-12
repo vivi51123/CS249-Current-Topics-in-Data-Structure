@@ -1,4 +1,4 @@
-Code of the winning entry to the [Kaggle ECML/PKDD taxi destination competition](https://www.kaggle.com/c/pkdd-15-predict-taxi-service-trajectory-i). In our project, The implementation is based on the [wining method](https://github.com/adbrebs/taxi), and the training process is performed on a single NVIDIA TESLA V100 GPU with 16GB memory.
+Code of the NN-based revised model implementation to the [Kaggle ECML/PKDD taxi destination competition](https://www.kaggle.com/c/pkdd-15-predict-taxi-service-trajectory-i). In our project, The implementation is based on the [wining method](https://github.com/adbrebs/taxi), and the training process is performed on a single NVIDIA TESLA V100 GPU with 16GB memory.
 
 ## Dependencies
 
