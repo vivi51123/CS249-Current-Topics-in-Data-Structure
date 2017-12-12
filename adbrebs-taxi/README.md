@@ -1,4 +1,4 @@
-Code of the winning entry to the [Kaggle ECML/PKDD taxi destination competition](https://www.kaggle.com/c/pkdd-15-predict-taxi-service-trajectory-i). Our approach is described in [our paper](http://arxiv.org/abs/1508.00021).
+Code of the winning entry to the [Kaggle ECML/PKDD taxi destination competition](https://www.kaggle.com/c/pkdd-15-predict-taxi-service-trajectory-i). In our project, The implementation is based on the [wining method](https://github.com/adbrebs/taxi), and the training process is performed on a single NVIDIA TESLA V100 GPU with 16GB memory.
 
 ## Dependencies
 
@@ -15,6 +15,7 @@ We also used the scikit-learn Python library for their mean-shift clustering alg
 
 Here is a brief description of the Python files in the archive:
 
+* `Dockerfile`: configureation files for setting NVIDIA Docker with enviroment, requied packages (such as *fuel* and *block*) , relative working directory and commands for starting the training. (We updated based on the report of wining methods)
 * `config/*.py`: configuration files for the different models we have experimented with the model which gets the best solution is `mlp_tgtcls_1_cswdtx_alexandre.py`
 * `data/*.py` : files related to the data pipeline:
   * `__init__.py` contains some general statistics about the data
@@ -46,8 +47,8 @@ Note that some script expect the repository to be in your PYTHONPATH (go to the 
 4. Run `data/make_valid_cut.py test_times_0` to generate the validation set. This can take a few minutes.
 5. Run `data_analysis/cluster_arrival.py` to generate the arrival point clustering. This can take a few minutes.
 6. Create a folder `model_data` and a folder `output` (next to the training script), which will receive respectively a regular save of the model parameters and many submission files generated from the model at a regular interval.
-7. Run `./train.py dest_mlp_tgtcls_1_cswdtx_alexandre` to train the model. Output solutions are generated in `output/` every 1000 iterations. Interrupt the model with three consecutive Ctrl+C at any times. The training script is set to stop training after 10 000 000 iterations, but a result file produced after less than 2 000 000 iterations is already the winning solution. We trained our model on a GeForce GTX 680 card and it took about an afternoon to generate the winning solution.
+7. Run `./train.py dest_mlp_tgtcls_1_cswdtx_alexandre` to train the model. Output solutions are generated in `output/` every 1000 iterations. Interrupt the model with three consecutive Ctrl+C at any times. The training script is set to stop training after 10 000 000 iterations, but a result file produced after around 6 000 000 iterations is already the winning solution. We trained our model on a NVIDIA TESLA V100 GPU card and it took about one day to generate the winning solution.
    When running the training script, set the following Theano flags environment variable to exploit GPU parallelism:
    `THEANO_FLAGS=floatX=float32,device=gpu,optimizer=fast_run`
 
-*More information in [this pdf](https://github.com/adbrebs/taxi/blob/master/doc/short_report.pdf)*
+*More information in [this pdf](https://github.com/adbrebs/taxi/blob/master/doc/short_report.pdf)* and our [project report]().
